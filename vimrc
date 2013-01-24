@@ -25,6 +25,7 @@ Bundle 'surround.vim'
 Bundle 'kien/ctrlp.vim'
 Bundle 'Yggdroot/indentLine.git'
 Bundle 'scrooloose/nerdtree.git'
+Bundle 'jistr/vim-nerdtree-tabs'
 Bundle 'altercation/vim-colors-solarized'
 "
 
@@ -44,8 +45,13 @@ let NERDTreeShowHidden=1
 
 """ctrlp.vim"""
 let g:ctrlp_working_path_mode = 0
+" Show ctrl-p at the top of the screen
+let g:ctrlp_match_window_bottom = 0
+let g:ctrlp_match_window_reversed = 0
+" Open files from ctrl-p in a new tab
+let g:ctrlp_open_new_file = 't'
 nmap <leader>t :CtrlP<cr>
-"RoR CtrlP stuff
+" RoR CtrlP stuff
 nmap <leader>ec :CtrlP app/controllers<cr>
 nmap <leader>ea :CtrlP app<cr>
 nmap <leader>em :CtrlP app/models<cr>
@@ -162,7 +168,7 @@ set lazyredraw " to avoid scrolling problems"
 
 
 " Map NERDTreeToggle to convenient key
-nmap <leader>n :NERDTreeToggle<cr>
+nmap <leader>n :NERDTreeTabsToggle<cr>
 "  
 "  " NERDTree config
 let NERDTreeChDirMode=2
