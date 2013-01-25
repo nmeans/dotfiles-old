@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Pass the project directory in as an argument
+DIRVAL="$1"
+cd "$DIRVAL"
+
+# Set the session name based on the name of the project directory
+SESSION_NAME=`basename $DIRVAL`
+
+# If we've already got a session going, skip creation
+tmux has-session -t $SESSION_NAME 2> /dev/null
+if [ $? != 0 ]; then
+  # Start a new tmux session
+  tmux new-session -s $SESSION_NAME -n $SESSION_NAME -d
+  # Split the session 75%/25% vertically
+  tmux split-window -h -p 25 -t $SESSION_NAME
+  # Split the editor window 85%/15% horizontally
+  tmux split-window -v -p 15 -t $SESSION_NAME:1.1
+  # Split the shell sidebar 50% vertically
+  tmux split-window -v -t $SESSION_NAME:1.2
+  # Start vim in the main pane
+  if [ -f "$DIRVAL" ]; then
+    # Start vim with the requested file
+    tmux send-keys -t $SESSION_NAME:1.1 "vim $DIRVAL" C-m
+  else
+    # Start vim in the project directory
+    tmux send-keys -t $SESSION_NAME:1.1 'vim .' C-m
+  fi
+  # Tail the dev log below the editor
+  tmux send-keys -t $SESSION_NAME:1.3 'tail -f log/development.log' C-m
+  # Start up a Rails console in the bottom right pane
+  if [ -e "script/rails" ]; then
+    # Rails 3.0 and newer, use 'rails console'
+    tmux send-keys -t $SESSION_NAME:1.4 'script/rails console development' C-m
+  else
+    # Rails older than 3.0, use 'script/console'
+    tmux send-keys -t $SESSION_NAME:1.4 'script/console development' C-m
+  fi
+fi
+# Start with our editor pane selected
+tmux select-pane -t $SESSION_NAME:1.1
+# Attach to our existing or newly-created session
+tmux attach -t $SESSION_NAME
+
+
